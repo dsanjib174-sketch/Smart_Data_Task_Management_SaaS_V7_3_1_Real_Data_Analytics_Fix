@@ -1,0 +1,13 @@
+<%- include('../partials/header') %>
+<h2>Subscription Invoices</h2>
+<div class="alert alert-secondary">Invoice sender: <strong><%= company ? company.companyName : 'Smart Data' %></strong>. Update details in Company Profile.</div>
+<table class="table table-bordered table-striped align-middle">
+<thead><tr><th>Invoice No</th><th>Client</th><th>Plan</th><th>Amount</th><th>GST</th><th>Total</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
+<% invoices.forEach(i => { %>
+<tr>
+<td><%= i.invoiceNo %></td><td><%= i.tenant.companyName %></td><td><%= i.plan ? i.plan.name : '' %></td><td>₹<%= i.amount %></td><td>₹<%= i.gstAmount %></td><td><strong>₹<%= i.totalAmount %></strong></td><td><span class="badge bg-primary"><%= i.status %></span></td><td><a class="btn btn-sm btn-outline-dark" href="/superadmin/invoices/<%= i.id %>">View / Print</a></td>
+</tr>
+<% }) %>
+</tbody></table>
+<%- include('../partials/footer') %>

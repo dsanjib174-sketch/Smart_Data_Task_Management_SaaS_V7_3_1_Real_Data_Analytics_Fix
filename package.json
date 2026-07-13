@@ -1,0 +1,32 @@
+{
+  "name": "smart-data-task-management-saas-v7-3",
+  "version": "7.3.1",
+  "description": "Smart Data Task Management SaaS V7.3.1 Real Data Analytics Fix Edition - streamlined without Inventory, Vendor, PO, GRN, Assets, AMC and Warranty modules",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "prisma:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "seed": "node prisma/seed.js",
+    "setup": "npm install && npx prisma generate && npx prisma db push && npm run seed"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "qrcode": "^1.5.4",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.4.1",
+    "nodemailer": "^6.9.15"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7",
+    "prisma": "^5.22.0"
+  }
+}

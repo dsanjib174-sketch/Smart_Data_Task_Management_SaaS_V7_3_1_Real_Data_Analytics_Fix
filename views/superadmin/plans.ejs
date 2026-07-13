@@ -1,0 +1,3 @@
+<%- include('../partials/header') %>
+<h3>Subscription Plans</h3><table class="table table-bordered"><thead><tr><th>Name</th><th>Price</th><th>Days</th><th>Max Users</th><th>Max Tasks</th></tr></thead><tbody><% plans.forEach(p => { %><tr><td><%= p.name %></td><td>₹<%= p.price %></td><td><%= p.durationDays %></td><td><%= p.maxUsers %></td><td><%= p.maxTasks %></td></tr><% }) %></tbody></table>
+<%- include('../partials/footer') %>

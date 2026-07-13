@@ -1,0 +1,118 @@
+<%- include('../partials/header') %>
+<h3>Preventive Maintenance, Reminder & Escalation</h3>
+
+<%
+  const smartDataSchedules = schedules.filter(s => s.scheduleType === 'SMART_DATA');
+  const clientSchedules = schedules.filter(s => s.scheduleType === 'CLIENT');
+  const overdueSchedules = schedules.filter(s => s.status === 'OVERDUE');
+%>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card"><div class="card-body"><small>Total Schedule</small><h3><%= schedules.length %></h3></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><small>Smart Data Internal PM</small><h3><%= smartDataSchedules.length %></h3></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><small>Client PM</small><h3><%= clientSchedules.length %></h3></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><small>Overdue</small><h3><%= overdueSchedules.length %></h3></div></div></div>
+</div>
+
+<div class="card mb-3"><div class="card-header"><b>Create PM Schedule</b></div><div class="card-body">
+<form method="post" action="/maintenance/create" class="row g-2">
+  <% if (isSmartData) { %>
+    <div class="col-md-2">
+      <select name="scheduleType" id="scheduleType" class="form-select" onchange="toggleClientField()">
+        <option value="SMART_DATA">Smart Data Internal</option>
+        <option value="CLIENT">Client</option>
+      </select>
+    </div>
+    <div class="col-md-2" id="clientField" style="display:none;">
+      <select name="tenantId" class="form-select">
+        <option value="">Select Client</option>
+        <% tenants.forEach(t=>{ %><option value="<%= t.id %>"><%= t.companyName %></option><% }) %>
+      </select>
+    </div>
+  <% } else { %>
+    <input type="hidden" name="scheduleType" value="CLIENT">
+  <% } %>
+
+  <div class="col-md-2"><input name="title" class="form-control" placeholder="PM Title" required></div>
+  <div class="col-md-2">
+    <select name="category" class="form-select">
+      <option value="">Category</option>
+      <option>AC</option><option>DG</option><option>Fire</option><option>Pest Control</option><option>Electrical</option><option>Plumbing</option><option>Server</option><option>Database</option><option>Other</option>
+    </select>
+  </div>
+  <div class="col-md-2"><input name="serviceArea" class="form-control" placeholder="Service Area / Equipment"></div>
+  <div class="col-md-2"><input name="vendorName" class="form-control" placeholder="Service Provider"></div>
+  <div class="col-md-2"><input type="date" name="scheduledDate" class="form-control" required></div>
+  <div class="col-md-2">
+    <select name="frequency" class="form-select">
+      <option value="">Frequency</option>
+      <option>Daily</option><option>Weekly</option><option>Monthly</option><option>Quarterly</option><option>Half-Yearly</option><option>Yearly</option><option>Custom</option>
+    </select>
+  </div>
+  <div class="col-md-2"><input type="number" name="reminderDays" class="form-control" placeholder="Reminder Days" value="7"></div>
+  <div class="col-md-2">
+    <select name="escalation" class="form-select">
+      <option value="false">No Escalation</option>
+      <option value="true">Escalation Yes</option>
+    </select>
+  </div>
+  <div class="col-md-2"><select name="assignedToId" class="form-select"><option value="">Assign To</option><% users.forEach(u=>{ %><option value="<%= u.id %>"><%= u.name %></option><% }) %></select></div>
+  <div class="col-md-12"><textarea name="description" class="form-control" placeholder="Description"></textarea></div>
+  <div class="col-md-2"><button class="btn btn-primary w-100">Create Schedule</button></div>
+</form>
+</div></div>
+
+<div class="card mb-3"><div class="card-header"><b>PM Calendar</b></div><div class="card-body table-responsive">
+<table class="table table-bordered table-sm"><thead><tr><th>Date</th><th>Type</th><th>Client</th><th>Title</th><th>Category</th><th>Service Area</th><th>Frequency</th><th>Provider</th><th>Assigned To</th><th>Status</th><th>Action</th></tr></thead><tbody>
+<% schedules.forEach(s=>{ %>
+  <tr>
+    <td><%= s.scheduledDate.toISOString().slice(0,10) %></td>
+    <td><span class="badge <%= s.scheduleType === 'SMART_DATA' ? 'bg-primary' : 'bg-info' %>"><%= s.scheduleType === 'SMART_DATA' ? 'Smart Data' : 'Client' %></span></td>
+    <td><%= s.tenant ? s.tenant.companyName : 'Smart Data Internal' %></td>
+    <td><%= s.title %></td>
+    <td><%= s.category || '' %></td>
+    <td><%= s.serviceArea || '' %></td>
+    <td><%= s.frequency || '' %></td>
+    <td><%= s.vendorName || '' %></td>
+    <td><%= s.assignedTo?.name || '' %></td>
+    <td><%= s.status %></td>
+    <td><form method="post" action="/maintenance/<%= s.id %>/complete"><button class="btn btn-sm btn-success">Complete</button></form></td>
+  </tr>
+<% }) %>
+</tbody></table>
+</div></div>
+
+<div class="row g-3">
+<div class="col-md-6"><div class="card"><div class="card-header"><b>Email Reminder</b></div><div class="card-body">
+<form method="post" action="/maintenance/reminders/create" class="row g-2">
+  <% if (isSmartData) { %><div class="col-md-6"><select name="tenantId" class="form-select"><option value="">Smart Data Internal</option><% tenants.forEach(t=>{ %><option value="<%= t.id %>"><%= t.companyName %></option><% }) %></select></div><% } %>
+  <div class="col-md-6"><select name="maintenanceId" class="form-select"><option value="">Link PM Schedule</option><% schedules.forEach(s=>{ %><option value="<%= s.id %>"><%= s.title %> - <%= s.scheduledDate.toISOString().slice(0,10) %></option><% }) %></select></div>
+  <div class="col-md-6"><input name="recipientEmail" class="form-control" placeholder="Recipient Email" required></div>
+  <div class="col-md-6"><input name="scheduledAt" type="datetime-local" class="form-control" required></div>
+  <div class="col-md-6"><input name="subject" class="form-control" placeholder="Subject" required></div>
+  <div class="col-md-12"><textarea name="body" class="form-control" placeholder="Reminder body"></textarea></div>
+  <div class="col-md-12"><button class="btn btn-primary w-100">Schedule Reminder</button></div>
+</form>
+</div></div></div>
+<div class="col-md-6"><div class="card"><div class="card-header"><b>Escalation Rule</b></div><div class="card-body">
+<form method="post" action="/maintenance/escalations/create" class="row g-2">
+  <% if (isSmartData) { %><div class="col-md-6"><select name="tenantId" class="form-select"><option value="">Smart Data Internal</option><% tenants.forEach(t=>{ %><option value="<%= t.id %>"><%= t.companyName %></option><% }) %></select></div><% } %>
+  <div class="col-md-4"><input name="module" class="form-control" value="MAINTENANCE"></div>
+  <div class="col-md-2"><input name="level" type="number" class="form-control" value="1"></div>
+  <div class="col-md-3"><input name="delayHours" type="number" class="form-control" value="24"></div>
+  <div class="col-md-3"><input name="notifyEmail" class="form-control" placeholder="Email" required></div>
+  <div class="col-md-12"><button class="btn btn-primary w-100">Add Escalation</button></div>
+</form>
+</div></div></div>
+</div>
+
+<script>
+function toggleClientField(){
+  var type = document.getElementById('scheduleType');
+  var clientField = document.getElementById('clientField');
+  if (!type || !clientField) return;
+  clientField.style.display = type.value === 'CLIENT' ? 'block' : 'none';
+}
+toggleClientField();
+</script>
+<%- include('../partials/footer') %>

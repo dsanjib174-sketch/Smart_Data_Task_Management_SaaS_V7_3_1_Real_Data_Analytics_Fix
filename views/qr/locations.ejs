@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+<h2>QR Floor & Location Master</h2>
+<% if (allTenants) { %>
+<form method="GET" action="/qr-locations" class="card p-3 mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-4"><label>Select Client</label><select name="tenantId" class="form-select" onchange="this.form.submit()"><option value="">Select Client</option><% tenants.forEach(t => { %><option value="<%= t.id %>" <%= selectedTenantId === t.id ? 'selected' : '' %>><%= t.companyName %></option><% }) %></select></div>
+  </div>
+</form>
+<% } %>
+<form method="POST" action="/qr-locations/create" class="card p-3 mb-4">
+  <div class="row g-3">
+    <% if (allTenants) { %><div class="col-md-3"><label>Client</label><select name="tenantId" class="form-select" required><option value="">Select Client</option><% tenants.forEach(t => { %><option value="<%= t.id %>" <%= selectedTenantId === t.id ? 'selected' : '' %>><%= t.companyName %></option><% }) %></select></div><% } %>
+    <div class="col-md-3"><label>Floor</label><input name="floorName" class="form-control" placeholder="8th Floor" required></div>
+    <div class="col-md-3"><label>Location</label><input name="locationName" class="form-control" placeholder="Washroom / Pantry" required></div>
+    <div class="col-md-2"><label>Department</label><input name="department" class="form-control" placeholder="Admin / HK"></div>
+    <div class="col-md-1 d-flex align-items-end"><button class="btn btn-primary w-100">Create</button></div>
+  </div>
+</form>
+<table class="table table-bordered align-middle">
+<thead><tr><th>Client</th><th>Floor</th><th>Location</th><th>Department</th><th>QR</th><th>Complaint Link</th></tr></thead>
+<tbody>
+<% locations.forEach(l => { %>
+<tr><td><%= l.tenant ? l.tenant.companyName : '' %></td><td><%= l.floorName %></td><td><%= l.locationName %></td><td><%= l.department || '' %></td><td><img src="<%= l.qrCode %>" width="90"><br><a href="<%= l.qrCode %>" download="QR_<%= l.floorName %>_<%= l.locationName %>.png">Download</a></td><td><a href="<%= l.complaintUrl %>" target="_blank">Open</a></td></tr>
+<% }) %>
+</tbody></table>
+<%- include('../partials/footer') %>

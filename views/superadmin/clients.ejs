@@ -1,0 +1,47 @@
+<%- include('../partials/header') %>
+<h2>Client Management</h2>
+<form method="POST" action="/superadmin/clients/create" class="card p-3 mb-4">
+  <div class="row g-3">
+    <div class="col-md-3"><input name="companyName" class="form-control" placeholder="Company Name" required></div>
+    <div class="col-md-2"><input name="contactName" class="form-control" placeholder="Contact Name"></div>
+    <div class="col-md-2"><input name="email" type="email" class="form-control" placeholder="Email" required></div>
+    <div class="col-md-2"><input name="phone" class="form-control" placeholder="Phone"></div>
+    <div class="col-md-3"><input name="billingAddress" class="form-control" placeholder="Billing Address"></div>
+    <div class="col-md-2"><input name="gstNumber" class="form-control" placeholder="GST Number"></div>
+    <div class="col-md-2"><input name="panNumber" class="form-control" placeholder="PAN Number"></div>
+    <div class="col-md-2"><input name="city" class="form-control" placeholder="City"></div>
+    <div class="col-md-2"><input name="state" class="form-control" placeholder="State"></div>
+    <div class="col-md-2"><input name="pincode" class="form-control" placeholder="Pincode"></div>
+    <div class="col-md-2">
+      <select name="planId" class="form-select">
+        <option value="">No Plan</option>
+        <% plans.forEach(p => { %><option value="<%= p.id %>"><%= p.name %> ₹<%= p.price %></option><% }) %>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="TRIAL">Trial</option><option value="ACTIVE">Active</option><option value="SUSPENDED">Suspended</option><option value="EXPIRED">Expired</option>
+      </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-primary w-100">Add Client</button></div>
+  </div>
+</form>
+<table class="table table-bordered table-striped align-middle">
+  <thead><tr><th>Company</th><th>GST/PAN</th><th>Email</th><th>Phone</th><th>Plan</th><th>Status</th><th>Invoice</th></tr></thead>
+  <tbody>
+    <% clients.forEach(c => { %>
+      <tr>
+        <td><strong><%= c.companyName %></strong><br><small><%= c.billingAddress || '' %> <%= c.city || '' %> <%= c.state || '' %></small></td>
+        <td><small>GST: <%= c.gstNumber || '-' %><br>PAN: <%= c.panNumber || '-' %></small></td>
+        <td><%= c.email %></td><td><%= c.phone || '' %></td><td><%= c.plan ? c.plan.name : 'No Plan' %></td><td><span class="badge bg-secondary"><%= c.status %></span></td>
+        <td>
+          <% if (c.planId) { %>
+            <form method="POST" action="/superadmin/clients/<%= c.id %>/generate-invoice"><button class="btn btn-sm btn-outline-primary">Generate Invoice</button></form>
+            <% if (c.invoices && c.invoices[0]) { %><a class="btn btn-sm btn-link" href="/superadmin/invoices/<%= c.invoices[0].id %>">Latest Invoice</a><% } %>
+          <% } else { %><span class="text-muted">Assign plan first</span><% } %>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+<%- include('../partials/footer') %>

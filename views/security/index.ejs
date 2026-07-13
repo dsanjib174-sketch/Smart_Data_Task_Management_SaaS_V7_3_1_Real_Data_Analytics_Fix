@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+<h3>Security Center</h3>
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card"><div class="card-body"><small>Login Events</small><h3><%= loginHistory.length %></h3></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><small>Active Refresh Tokens</small><h3><%= refreshTokens.filter(t=>!t.revokedAt).length %></h3></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><small>Audit Logs</small><h3><%= auditLogs.length %></h3></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><small>Password Min Length</small><h3><%= passwordPolicy.minLength %></h3></div></div></div>
+</div>
+
+<div class="card mb-3"><div class="card-header"><b>Password Policy</b></div><div class="card-body">
+<form method="post" action="/security/password-policy" class="row g-2">
+  <div class="col-md-2"><label>Min Length</label><input name="minLength" type="number" value="<%= passwordPolicy.minLength %>" class="form-control"></div>
+  <div class="col-md-2"><label>Expiry Days</label><input name="expiryDays" type="number" value="<%= passwordPolicy.expiryDays %>" class="form-control"></div>
+  <div class="col-md-2"><label>Max Failed</label><input name="maxFailedAttempts" type="number" value="<%= passwordPolicy.maxFailedAttempts %>" class="form-control"></div>
+  <div class="col-md-4 pt-4">
+    <label class="me-2"><input type="checkbox" name="requireUppercase" <%= passwordPolicy.requireUppercase ? 'checked' : '' %>> Uppercase</label>
+    <label class="me-2"><input type="checkbox" name="requireLowercase" <%= passwordPolicy.requireLowercase ? 'checked' : '' %>> Lowercase</label>
+    <label class="me-2"><input type="checkbox" name="requireNumber" <%= passwordPolicy.requireNumber ? 'checked' : '' %>> Number</label>
+    <label><input type="checkbox" name="requireSpecial" <%= passwordPolicy.requireSpecial ? 'checked' : '' %>> Special</label>
+  </div>
+  <div class="col-md-2 pt-4"><button class="btn btn-primary w-100">Save</button></div>
+</form>
+</div></div>
+
+<div class="row g-3">
+<div class="col-md-6"><div class="card"><div class="card-header"><b>Login History & IP Tracking</b></div><div class="card-body table-responsive" style="max-height:420px; overflow:auto;"><table class="table table-sm table-bordered"><thead><tr><th>Time</th><th>Email</th><th>Status</th><th>IP</th><th>Device</th></tr></thead><tbody><% loginHistory.forEach(l=>{ %><tr><td><%= l.createdAt.toISOString().replace('T',' ').slice(0,16) %></td><td><%= l.email %></td><td><%= l.status %></td><td><%= l.ipAddress || '' %></td><td><%= (l.userAgent || '').slice(0,45) %></td></tr><% }) %></tbody></table></div></div></div>
+<div class="col-md-6"><div class="card"><div class="card-header"><b>Audit Logs</b></div><div class="card-body table-responsive" style="max-height:420px; overflow:auto;"><table class="table table-sm table-bordered"><thead><tr><th>Time</th><th>Module</th><th>Action</th><th>Record</th></tr></thead><tbody><% auditLogs.forEach(a=>{ %><tr><td><%= a.createdAt.toISOString().replace('T',' ').slice(0,16) %></td><td><%= a.module %></td><td><%= a.action %></td><td><%= a.recordId || '' %></td></tr><% }) %></tbody></table></div></div></div>
+</div>
+<%- include('../partials/footer') %>

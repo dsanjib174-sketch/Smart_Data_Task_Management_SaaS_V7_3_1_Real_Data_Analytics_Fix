@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<h3>User Management Kanban</h3>
+<div class="card mb-4"><div class="card-header"><strong>Create New User</strong></div><div class="card-body">
+<form method="POST" action="/superadmin/users/create"><div class="row g-3">
+  <div class="col-md-2"><label>Name</label><input name="name" class="form-control" required></div>
+  <div class="col-md-2"><label>Email</label><input name="email" type="email" class="form-control" required></div>
+  <div class="col-md-2"><label>Phone</label><input name="phone" class="form-control"></div>
+  <div class="col-md-2"><label>Designation</label><input name="designation" class="form-control"></div>
+  <div class="col-md-2"><label>Department</label><input name="department" class="form-control"></div>
+  <div class="col-md-2"><label>Password</label><input name="password" class="form-control" placeholder="User@12345"></div>
+  <div class="col-md-3"><label>Role</label><select name="roleId" class="form-select" required><% roles.forEach(r => { %><option value="<%= r.id %>"><%= r.name %> - <%= r.scope %></option><% }) %></select></div>
+  <div class="col-md-3"><label>Client</label><select name="tenantId" class="form-select"><option value="">Smart Data Internal</option><% tenants.forEach(t => { %><option value="<%= t.id %>"><%= t.companyName %></option><% }) %></select></div>
+  <div class="col-md-2"><label>Status</label><select name="status" class="form-select"><option>ACTIVE</option><option>INACTIVE</option></select></div>
+  <div class="col-md-2 d-flex align-items-end"><button class="btn btn-primary w-100">Create User</button></div>
+</div></form></div></div>
+<div class="row g-3">
+<% const cols = ['SUPER_ADMIN','SMART_DATA_ADMIN','SUPPORT','DEVELOPER','CLIENT_ADMIN','MANAGER','EMPLOYEE','VIEWER']; %>
+<% cols.forEach(col => { %>
+  <div class="col-md-3"><div class="kanban-col"><h6><%= col.replaceAll('_',' ') %></h6>
+  <% users.filter(u => u.role && u.role.name === col).forEach(u => { %>
+    <div class="card mb-3 shadow-sm"><div class="card-body"><h6><%= u.name %></h6><small><%= u.email %></small><br><small><%= u.tenant ? u.tenant.companyName : 'Smart Data' %></small><br><span class="badge <%= u.status === 'ACTIVE' ? 'bg-success' : 'bg-secondary' %>"><%= u.status %></span>
+    <form method="POST" action="/superadmin/users/<%= u.id %>/status" class="mt-2"><select name="status" class="form-select form-select-sm mb-2"><option value="ACTIVE" <%= u.status === 'ACTIVE' ? 'selected' : '' %>>ACTIVE</option><option value="INACTIVE" <%= u.status === 'INACTIVE' ? 'selected' : '' %>>INACTIVE</option></select><button class="btn btn-sm btn-outline-primary w-100">Update</button></form>
+    </div></div>
+  <% }) %>
+  </div></div>
+<% }) %>
+</div>
+<%- include('../partials/footer') %>

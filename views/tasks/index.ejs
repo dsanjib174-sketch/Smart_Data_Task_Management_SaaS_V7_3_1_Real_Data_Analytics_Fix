@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+<h2>Task Kanban</h2>
+<% if (allAccess) { %>
+<form method="GET" action="/tasks" class="card p-3 mb-3">
+  <div class="row g-2"><div class="col-md-4"><select name="tenantId" class="form-select" onchange="this.form.submit()"><option value="">All Clients</option><% tenants.forEach(t => { %><option value="<%= t.id %>" <%= selectedTenantId === t.id ? 'selected' : '' %>><%= t.companyName %></option><% }) %></select></div></div>
+</form>
+<% } %>
+<form method="POST" action="/tasks/create" class="card p-3 mb-4">
+  <h5>Create Task</h5>
+  <div class="row g-3">
+    <% if (allAccess) { %><div class="col-md-3"><label>Client</label><select name="tenantId" class="form-select" required><option value="">Select Client</option><% tenants.forEach(t => { %><option value="<%= t.id %>" <%= selectedTenantId === t.id ? 'selected' : '' %>><%= t.companyName %></option><% }) %></select></div><% } %>
+    <div class="col-md-3"><label>Title</label><input name="title" class="form-control" required></div>
+    <div class="col-md-2"><label>Priority</label><select name="priority" class="form-select"><option>LOW</option><option selected>MEDIUM</option><option>HIGH</option><option>URGENT</option></select></div>
+    <div class="col-md-2"><label>Due Date</label><input name="dueDate" type="date" class="form-control"></div>
+    <div class="col-md-2"><label>Status</label><select name="status" class="form-select"><option>OPEN</option><option>ASSIGNED</option><option>IN_PROGRESS</option><option>WAITING_APPROVAL</option></select></div>
+    <div class="col-md-3"><label>Assign To</label><select name="assignedToId" class="form-select"><option value="">Unassigned</option><% users.forEach(u => { %><option value="<%= u.id %>"><%= u.name %></option><% }) %></select></div>
+    <div class="col-md-3"><label>Location</label><select name="locationId" class="form-select"><option value="">No Location</option><% locations.forEach(l => { %><option value="<%= l.id %>"><%= l.floorName %> - <%= l.locationName %></option><% }) %></select></div>
+    <div class="col-md-4"><label>Description</label><input name="description" class="form-control"></div>
+    <div class="col-md-2 d-flex align-items-end"><button class="btn btn-primary w-100">Create Task</button></div>
+  </div>
+</form>
+<div class="kanban row g-3">
+<% ['OPEN','ASSIGNED','IN_PROGRESS','WAITING_APPROVAL','COMPLETED','CLOSED'].forEach(status => { %>
+  <div class="col-md-2"><div class="card h-100"><div class="card-header fw-bold"><%= status.replaceAll('_',' ') %></div><div class="card-body kanban-col">
+  <% tasks.filter(t => t.status === status).forEach(t => { %><div class="card mb-2 shadow-sm"><div class="card-body p-2"><strong><%= t.title %></strong><br><small><%= t.tenant ? t.tenant.companyName : '' %></small><br><span class="badge bg-info"><%= t.priority %></span><% if (t.assignedTo) { %><br><small>Assigned: <%= t.assignedTo.name %></small><% } %><form method="POST" action="/tasks/<%= t.id %>/status" class="mt-2"><select name="status" class="form-select form-select-sm" onchange="this.form.submit()"><% ['OPEN','ASSIGNED','IN_PROGRESS','WAITING_APPROVAL','COMPLETED','CLOSED','CANCELLED'].forEach(s => { %><option value="<%= s %>" <%= t.status === s ? 'selected' : '' %>><%= s %></option><% }) %></select></form></div></div><% }) %>
+  </div></div></div>
+<% }) %>
+</div>
+<%- include('../partials/footer') %>

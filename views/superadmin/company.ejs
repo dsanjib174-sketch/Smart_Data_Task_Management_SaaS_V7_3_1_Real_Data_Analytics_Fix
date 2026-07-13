@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+<h2>Smart Data Company Profile</h2>
+<div class="alert alert-info">These details will be used in subscription invoices.</div>
+<form method="POST" action="/superadmin/company" class="card p-3">
+  <div class="row g-3">
+    <div class="col-md-3"><label>Display Name</label><input name="companyName" value="<%= company.companyName || '' %>" class="form-control" required></div>
+    <div class="col-md-3"><label>Legal Name</label><input name="legalName" value="<%= company.legalName || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>GST Number</label><input name="gstNumber" value="<%= company.gstNumber || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>PAN Number</label><input name="panNumber" value="<%= company.panNumber || '' %>" class="form-control"></div>
+    <div class="col-md-6"><label>Address</label><textarea name="address" class="form-control"><%= company.address || '' %></textarea></div>
+    <div class="col-md-2"><label>City</label><input name="city" value="<%= company.city || '' %>" class="form-control"></div>
+    <div class="col-md-2"><label>State</label><input name="state" value="<%= company.state || '' %>" class="form-control"></div>
+    <div class="col-md-2"><label>Pincode</label><input name="pincode" value="<%= company.pincode || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>Email</label><input name="email" value="<%= company.email || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>Phone</label><input name="phone" value="<%= company.phone || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>Website</label><input name="website" value="<%= company.website || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>Logo URL</label><input name="logoUrl" value="<%= company.logoUrl || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>Bank Name</label><input name="bankName" value="<%= company.bankName || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>Account Name</label><input name="accountName" value="<%= company.accountName || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>Account No.</label><input name="accountNo" value="<%= company.accountNo || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>IFSC Code</label><input name="ifscCode" value="<%= company.ifscCode || '' %>" class="form-control"></div>
+    <div class="col-md-3"><label>UPI ID</label><input name="upiId" value="<%= company.upiId || '' %>" class="form-control"></div>
+    <div class="col-md-12"><button class="btn btn-primary">Save Company Profile</button></div>
+  </div>
+</form>
+<%- include('../partials/footer') %>

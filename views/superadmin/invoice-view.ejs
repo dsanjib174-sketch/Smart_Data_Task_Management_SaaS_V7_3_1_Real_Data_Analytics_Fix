@@ -1,0 +1,38 @@
+<%- include('../partials/header') %>
+<div class="d-flex justify-content-between mb-3"><h2>Tax Invoice</h2><button onclick="window.print()" class="btn btn-primary">Print Invoice</button></div>
+<div class="card p-4" id="invoiceBox">
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <h3><%= company?.companyName || 'Smart Data' %></h3>
+      <p class="mb-1"><%= company?.legalName || '' %></p>
+      <p class="mb-1"><%= company?.address || '' %> <%= company?.city || '' %> <%= company?.state || '' %> <%= company?.pincode || '' %></p>
+      <p class="mb-1">GST: <%= company?.gstNumber || '-' %> | PAN: <%= company?.panNumber || '-' %></p>
+      <p class="mb-1">Email: <%= company?.email || '-' %> | Phone: <%= company?.phone || '-' %></p>
+    </div>
+    <div class="col-md-6 text-md-end">
+      <h5>Invoice No: <%= invoice.invoiceNo %></h5>
+      <p>Date: <%= invoice.invoiceDate.toISOString().slice(0,10) %></p>
+      <p>Due Date: <%= invoice.dueDate ? invoice.dueDate.toISOString().slice(0,10) : '-' %></p>
+      <p>Status: <strong><%= invoice.status %></strong></p>
+    </div>
+  </div>
+  <hr>
+  <h5>Bill To</h5>
+  <p><strong><%= invoice.tenant.companyName %></strong><br>
+  <%= invoice.tenant.billingAddress || '' %> <%= invoice.tenant.city || '' %> <%= invoice.tenant.state || '' %> <%= invoice.tenant.pincode || '' %><br>
+  GST: <%= invoice.tenant.gstNumber || '-' %> | PAN: <%= invoice.tenant.panNumber || '-' %><br>
+  Email: <%= invoice.tenant.email %> | Phone: <%= invoice.tenant.phone || '-' %></p>
+  <table class="table table-bordered">
+    <thead><tr><th>Description</th><th class="text-end">Amount</th></tr></thead>
+    <tbody>
+      <tr><td>Subscription Plan - <%= invoice.plan ? invoice.plan.name : 'Plan' %></td><td class="text-end">₹<%= invoice.amount %></td></tr>
+      <tr><td>GST @ <%= invoice.gstRate %>%</td><td class="text-end">₹<%= invoice.gstAmount %></td></tr>
+      <tr><th>Total Payable</th><th class="text-end">₹<%= invoice.totalAmount %></th></tr>
+    </tbody>
+  </table>
+  <div class="row mt-4">
+    <div class="col-md-6"><h6>Bank Details</h6><p><%= company?.bankName || '' %><br>Account: <%= company?.accountNo || '' %><br>IFSC: <%= company?.ifscCode || '' %><br>UPI: <%= company?.upiId || '' %></p></div>
+    <div class="col-md-6 text-md-end"><p class="mt-5">Authorized Signatory<br><strong><%= company?.companyName || 'Smart Data' %></strong></p></div>
+  </div>
+</div>
+<%- include('../partials/footer') %>

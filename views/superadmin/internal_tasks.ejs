@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+<h2>Smart Data Internal Task Kanban</h2>
+<p class="text-muted">Create and assign tasks to Super Admin, Support, Developer, Accounts, Sales, QA and other Smart Data internal users.</p>
+
+<form method="POST" action="/superadmin/internal-tasks/create" class="card p-3 mb-4">
+  <h5>Create Internal Task</h5>
+  <div class="row g-3">
+    <div class="col-md-3"><label>Task Title</label><input name="title" class="form-control" required></div>
+    <div class="col-md-2"><label>Department</label><input name="department" class="form-control" placeholder="Support / Developer / Accounts"></div>
+    <div class="col-md-2"><label>Assign To</label><select name="assignedToId" class="form-select"><option value="">Unassigned</option><% users.forEach(u => { %><option value="<%= u.id %>"><%= u.name %> <%= u.department ? '(' + u.department + ')' : '' %></option><% }) %></select></div>
+    <div class="col-md-2"><label>Priority</label><select name="priority" class="form-select"><option>LOW</option><option selected>MEDIUM</option><option>HIGH</option><option>URGENT</option></select></div>
+    <div class="col-md-2"><label>Status</label><select name="status" class="form-select"><% statuses.forEach(s => { %><option value="<%= s %>"><%= s.replaceAll('_',' ') %></option><% }) %></select></div>
+    <div class="col-md-2"><label>Start Date</label><input type="date" name="startDate" class="form-control"></div>
+    <div class="col-md-2"><label>Due Date</label><input type="date" name="dueDate" class="form-control"></div>
+    <div class="col-md-3"><label>Attachment URL</label><input name="attachmentUrl" class="form-control" placeholder="Google Drive / file URL"></div>
+    <div class="col-md-4"><label>Description</label><input name="description" class="form-control"></div>
+    <div class="col-md-3"><label>Checklist (one item per line)</label><textarea name="checklist" class="form-control" rows="1"></textarea></div>
+    <div class="col-md-1 d-flex align-items-end"><button class="btn btn-primary w-100">Add</button></div>
+  </div>
+</form>
+
+<form method="GET" action="/superadmin/internal-tasks" class="card p-3 mb-4">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-3"><label>Department Filter</label><select name="department" class="form-select"><option value="">All Departments</option><% departments.forEach(d => { %><option value="<%= d %>" <%= selectedDepartment === d ? 'selected' : '' %>><%= d %></option><% }) %></select></div>
+    <div class="col-md-3"><label>Assigned To</label><select name="assignedToId" class="form-select"><option value="">All Users</option><% users.forEach(u => { %><option value="<%= u.id %>" <%= selectedAssignedTo === u.id ? 'selected' : '' %>><%= u.name %></option><% }) %></select></div>
+    <div class="col-md-2"><button class="btn btn-outline-primary w-100">Filter</button></div>
+    <div class="col-md-2"><a href="/superadmin/internal-tasks" class="btn btn-outline-secondary w-100">Clear</a></div>
+  </div>
+</form>
+
+<div class="kanban row g-3">
+<% statuses.forEach(status => { %>
+  <div class="col-md-3 col-xl-2">
+    <div class="card h-100">
+      <div class="card-header fw-bold"><%= status.replaceAll('_',' ') %></div>
+      <div class="card-body kanban-col">
+        <% tasks.filter(t => t.status === status).forEach(t => { %>
+          <div class="card mb-2 shadow-sm">
+            <div class="card-body p-2">
+              <strong><%= t.title %></strong><br>
+              <small><%= t.department || 'No Department' %></small><br>
+              <span class="badge bg-info"><%= t.priority %></span>
+              <% if (t.assignedTo) { %><br><small>Assigned: <%= t.assignedTo.name %></small><% } %>
+              <% if (t.dueDate) { %><br><small>Due: <%= new Date(t.dueDate).toLocaleDateString('en-IN') %></small><% } %>
+              <% if (t.attachmentUrl) { %><br><a href="<%= t.attachmentUrl %>" target="_blank">Attachment</a><% } %>
+              <form method="POST" action="/superadmin/internal-tasks/<%= t.id %>/status" class="mt-2">
+                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <% ['NEW','ASSIGNED','IN_PROGRESS','TESTING','WAITING_APPROVAL','COMPLETED','CLOSED','CANCELLED'].forEach(s => { %>
+                    <option value="<%= s %>" <%= t.status === s ? 'selected' : '' %>><%= s.replaceAll('_',' ') %></option>
+                  <% }) %>
+                </select>
+              </form>
+              <form method="POST" action="/superadmin/internal-tasks/<%= t.id %>/assign" class="mt-2">
+                <select name="assignedToId" class="form-select form-select-sm" onchange="this.form.submit()">
+                  <option value="">Unassigned</option>
+                  <% users.forEach(u => { %><option value="<%= u.id %>" <%= t.assignedToId === u.id ? 'selected' : '' %>><%= u.name %></option><% }) %>
+                </select>
+              </form>
+              <form method="POST" action="/superadmin/internal-tasks/<%= t.id %>/delete" onsubmit="return confirm('Delete this task?')" class="mt-2"><button class="btn btn-sm btn-outline-danger w-100">Delete</button></form>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+<% }) %>
+</div>
+<%- include('../partials/footer') %>
