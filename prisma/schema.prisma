@@ -87,6 +87,11 @@ enum ScheduleType {
   CLIENT
 }
 
+enum QRScope {
+  SMART_DATA
+  CLIENT
+}
+
 model CompanySetting {
   id          String   @id @default("SMART_DATA")
   companyName String   @default("Smart Data")
@@ -211,21 +216,25 @@ model User {
 }
 
 model Location {
-  id           String @id @default(uuid())
-  tenantId     String
+  id           String  @id @default(uuid())
+  scope        QRScope @default(CLIENT)
+  tenantId     String?
   floorName    String
   locationName String
   department   String?
   qrCode       String?
   complaintUrl String?
-  status       String @default("ACTIVE")
+  status       String  @default("ACTIVE")
 
-  tenant      Tenant      @relation(fields: [tenantId], references: [id])
+  tenant      Tenant?     @relation(fields: [tenantId], references: [id])
   complaints  Complaint[]
   tasks       Task[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([scope])
+  @@index([tenantId])
 }
 
 model Task {
